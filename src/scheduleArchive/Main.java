@@ -19,8 +19,8 @@ import java.util.Properties;
 
 public class Main extends Application {
 
-    static UrlFetcher urlFetcher = new UrlFetcher();
-    public static final String ARCHIVE_URL = urlFetcher.fetchURL();
+
+    public static final String ARCHIVE_URL = fetchURL();
 
 
     public static String selectedDay;
@@ -44,8 +44,35 @@ public class Main extends Application {
 
 
 
+
+    private static String fetchURL(){
+        String propFileDirectory = "/Users/sabastocrator/Desktop/ScheduleArchive/src/Properties/archiveUrl.properties";
+
+
+        Properties urlProp = new Properties();
+
+
+
+
+        try {
+            InputStream inputStream = new FileInputStream(propFileDirectory);
+            urlProp.load(inputStream);
+        } catch (IOException e) {
+            System.out.println("property file: " + propFileDirectory + ", not found");
+        }
+
+        return  urlProp.getProperty("URL");
+
+
+    }
+
+
+
+
+
     @Override
     public void start(Stage primaryStage) throws Exception{
+
 
 
         loadScreen = new Scene(FXMLLoader.load(getClass().getResource("Scenes/loadScreen.fxml")), screenWidth, screenHeight);
@@ -68,6 +95,8 @@ public class Main extends Application {
     public void stop(){
 
         backupData();
+        System.exit(0);
+
     }
 
     public static void backupData(){

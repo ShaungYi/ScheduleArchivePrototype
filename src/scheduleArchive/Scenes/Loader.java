@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
+import org.sqlite.SQLiteConnection;
 import scheduleArchive.Utility.Activity;
 import scheduleArchive.Main;
 
@@ -71,14 +72,17 @@ public class Loader {
 
 
 
-            DatabaseMetaData metaData = conn.getMetaData();
-            String[] types = {"TABLE"};
-            pastDays = metaData.getTables(null, null, "%", types);
+            Connection backupConn = DriverManager.getConnection(Main.ARCHIVE_URL);
+            Statement backupStatement = backupConn.createStatement();
+
+
+            backupStatement.execute("CREATE TABLE IF NOT EXISTS annals (date text, duplicates INTEGER)");
+            ResultSet annalSet = backupStatement.executeQuery("SELECT * FROM annals");
 
 
 
-            while (pastDays.next()){
-                backupData.add(Main.toDay(pastDays.getString("TABLE_NAME")));
+            while (annalSet.next()){
+                backupData.add(annalSet.getString("date"));
             }
 
             if (!backupData.isEmpty()){
@@ -243,7 +247,7 @@ public class Loader {
 
            String currentSelected = (String)backups.getSelectionModel().getSelectedItem();
 
-           statement.execute("SELECT * FROM "+Main.toTableName(Main.selectedDay));
+           statement.execute("SELECT * FROM "+Main.toTableName(currentSelected));
 
            ResultSet testData = statement.getResultSet();
 
